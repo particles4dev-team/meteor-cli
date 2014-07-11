@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+var program = require('commander');
+var fs = require('fs');
+var clone = require("nodegit").Repo.clone;
+
+program
+  .version('0.0.1')
+
+program
+  .command('meteor [name]')
+  .description('initialize project configuration')
+  .action(function(name){
+    console.log('create folder ...');
+    fs.mkdirSync(name, 0777);
+    // Clone a given repository into a specific folder.
+    console.log('clone git ...');
+    clone("https://github.com/particle4dev/sample-project.git", name, null, function(err, repo) {
+      if (err) {
+        throw err;
+      }
+      console.log('done !');
+    });
+});
+
+program
+  .command('meteormobile [name]')
+  .description('initialize project configuration')
+  .action(function(name){
+    console.log('create folder ...');
+    fs.mkdirSync(name, 0777);
+    // Clone a given repository into a specific folder.
+    console.log('clone git ...');
+    clone("https://github.com/particle4dev/sample-project-mobile.git", name, null, function(err, repo) {
+      if (err) {
+        throw err;
+      }
+      console.log('done !');
+    });
+});
+
+program
+  .command('*')
+  .action(function(env){
+    console.log('Enter a Valid command');
+    terminate(true);
+});
+
+program.parse(process.argv);

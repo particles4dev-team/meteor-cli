@@ -1,0 +1,3 @@
+node modules
+ * commander
+ * nodegit
