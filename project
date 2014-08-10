@@ -1,41 +1,70 @@
 #!/usr/bin/env node
-var program = require('commander');
-var fs = require('fs');
-var clone = require("nodegit").Repo.clone;
+var program     = require('commander');
+var fs          = require('fs');
+var clone       = require("nodegit").Repo.clone;
+var handlebars  = require('handlebars');
+var path        = require('path');
+var Fiber       = require('fibers');
+var Future      = require('fibers/future');
 
 program
   .version('0.0.1')
 
 program
-  .command('meteor [name]')
-  .description('create meteor project')
-  .action(function(name){
+  .command('init')
+  .description('download project and save locally [stable]')
+  .action(function(){
+    var rootPath = __dirname,
+    templatePath = path.resolve(rootPath, 'template');
+    if (fs.existsSync(templatePath)) {
+      // delete
+      console.log('delete folder ...');
+      deleteFolderRecursive(templatePath);
+    }
+    // update
     console.log('create folder ...');
-    fs.mkdirSync(name, 0777);
+    fs.mkdirSync(templatePath, 0777);
+
     // Clone a given repository into a specific folder.
     console.log('clone git ...');
-    clone("https://github.com/particle4dev/sample-project.git", name, null, function(err, repo) {
+    clone("https://github.com/particle4dev/sample-project.git", templatePath, null, function(err, repo) {
       if (err) {
+        console.log(err, templatePath);
         throw err;
       }
       console.log('done !');
     });
+
+    // var source = "<p>Hello, my name is {{name}}. I am from {{hometown}}. I have " +
+    //          "{{kids.length}} kids:</p>" +
+    //          "<ul>{{#kids}}<li>{{name}} is {{age}}</li>{{/kids}}</ul>";
+    // var template = handlebars.compile(source);
+
+    // var data = { "name": "Alan", "hometown": "Somewhere, TX",
+    //          "kids": [{"name": "Jimmy", "age": "12"}, {"name": "Sally", "age": "4"}]};
+    // var result = template(data);
+    // console.log(result);
+});
+
+program
+  .command('generate [name]')
+  .description('create meteor project [stable]')
+  .action(function(name){
+    
 });
 
 program
   .command('meteormobile [name]')
   .description('create meteor mobile project')
   .action(function(name){
-    console.log('create folder ...');
-    fs.mkdirSync(name, 0777);
-    // Clone a given repository into a specific folder.
-    console.log('clone git ...');
-    clone("https://github.com/particle4dev/sample-project-mobile.git", name, null, function(err, repo) {
-      if (err) {
-        throw err;
-      }
-      console.log('done !');
-    });
+
+});
+
+program
+  .command('collection [name] [where]')
+  .description('add meteor collection ')
+  .action(function(name, where){
+    console.log(name, where);
 });
 
 program
@@ -46,3 +75,18 @@ program
 });
 
 program.parse(process.argv);
+
+// helpers
+function deleteFolderRecursive (path) {
+  if( fs.existsSync(path) ) {
+    fs.readdirSync(path).forEach(function(file,index){
+      var curPath = path + "/" + file;
+      if(fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};
