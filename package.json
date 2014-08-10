@@ -4,6 +4,7 @@
   "description": "my command line tool for meteor",
   "main": "index.js",
   "dependencies": {
+    "cli-color": "^0.3.2",
     "commander": "^2.3.0",
     "fibers": "^1.0.1",
     "handlebars": "^2.0.0-alpha.4",

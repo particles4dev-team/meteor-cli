@@ -6,44 +6,77 @@ var handlebars  = require('handlebars');
 var path        = require('path');
 var Fiber       = require('fibers');
 var Future      = require('fibers/future');
+var clc         = require('cli-color');
 
+// helpers
+var Logs = {
+  'log': function(message){
+    console.log(message);
+  },
+  'info': function(message){
+    console.log(clc.green(message));
+  },
+  'warn': function(message){
+    console.log(clc.yellow(message));
+  },
+  'error': function(message){
+    console.log(clc.red(message));
+  }
+};
+
+function deleteFolderRecursive (path) {
+  if( fs.existsSync(path) ) {
+    fs.readdirSync(path).forEach(function(file,index){
+      var curPath = path + "/" + file;
+      if(fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};
+
+function isMeteorAppDir () {
+  var cpath = __dirname,
+  appPath = path.resolve(cpath, '.meteor');
+  if (!fs.existsSync(appPath))
+    throw new Error('not found meteor app');
+};
+
+// commands
 program
-  .version('0.0.1')
+  .version('0.1.0')
 
 program
   .command('init')
   .description('download project and save locally [stable]')
   .action(function(){
+  try {
     var rootPath = __dirname,
     templatePath = path.resolve(rootPath, 'template');
     if (fs.existsSync(templatePath)) {
       // delete
-      console.log('delete folder ...');
+      Logs.info('delete folder ...');
       deleteFolderRecursive(templatePath);
     }
     // update
-    console.log('create folder ...');
+    Logs.info('create folder ...');
     fs.mkdirSync(templatePath, 0777);
 
     // Clone a given repository into a specific folder.
-    console.log('clone git ...');
+    Logs.info('clone git ...');
     clone("https://github.com/particle4dev/sample-project.git", templatePath, null, function(err, repo) {
       if (err) {
-        console.log(err, templatePath);
         throw err;
       }
-      console.log('done !');
+      Logs.info('done !');
     });
-
-    // var source = "<p>Hello, my name is {{name}}. I am from {{hometown}}. I have " +
-    //          "{{kids.length}} kids:</p>" +
-    //          "<ul>{{#kids}}<li>{{name}} is {{age}}</li>{{/kids}}</ul>";
-    // var template = handlebars.compile(source);
-
-    // var data = { "name": "Alan", "hometown": "Somewhere, TX",
-    //          "kids": [{"name": "Jimmy", "age": "12"}, {"name": "Sally", "age": "4"}]};
-    // var result = template(data);
-    // console.log(result);
+  }
+  catch(err){
+    Logs.error('init: ' + err.message);
+  }
 });
 
 program
@@ -64,7 +97,13 @@ program
   .command('collection [name] [where]')
   .description('add meteor collection ')
   .action(function(name, where){
+  try {
     console.log(name, where);
+    isMeteorAppDir();
+  }
+  catch(err){
+    Logs.error('collection: ' + err.message);
+  }
 });
 
 program
@@ -76,17 +115,12 @@ program
 
 program.parse(process.argv);
 
-// helpers
-function deleteFolderRecursive (path) {
-  if( fs.existsSync(path) ) {
-    fs.readdirSync(path).forEach(function(file,index){
-      var curPath = path + "/" + file;
-      if(fs.lstatSync(curPath).isDirectory()) { // recurse
-        deleteFolderRecursive(curPath);
-      } else { // delete file
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(path);
-  }
-};
+// var source = "<p>Hello, my name is {{name}}. I am from {{hometown}}. I have " +
+//          "{{kids.length}} kids:</p>" +
+//          "<ul>{{#kids}}<li>{{name}} is {{age}}</li>{{/kids}}</ul>";
+// var template = handlebars.compile(source);
+
+// var data = { "name": "Alan", "hometown": "Somewhere, TX",
+//          "kids": [{"name": "Jimmy", "age": "12"}, {"name": "Sally", "age": "4"}]};
+// var result = template(data);
+// console.log(result);
