@@ -7,6 +7,8 @@ var path        = require('path');
 var Fiber       = require('fibers');
 var Future      = require('fibers/future');
 var clc         = require('cli-color');
+var _           = require('lodash');
+var ncp         = require('ncp').ncp;
 
 // helpers
 var Logs = {
@@ -38,11 +40,29 @@ function deleteFolderRecursive (path) {
   }
 };
 
+function getRootPath () {
+  return __dirname;
+};
+
+function getCurentPath () {
+  return fs.realpathSync( process.cwd() );
+};
+
 function isMeteorAppDir () {
-  var cpath = __dirname,
+  var cpath = getCurentPath(),
   appPath = path.resolve(cpath, '.meteor');
   if (!fs.existsSync(appPath))
     throw new Error('not found meteor app');
+};
+
+function parseTemplate (data, tmp) {
+  var template = handlebars.compile(tmp);
+  return template(data);
+};
+
+// char => Char 
+function capitaliseFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
 // commands
@@ -54,13 +74,13 @@ program
   .description('download project and save locally [stable]')
   .action(function(){
   try {
-    var rootPath = __dirname,
-    templatePath = path.resolve(rootPath, 'template');
+    var templatePath = path.resolve(getRootPath(), 'template');
     if (fs.existsSync(templatePath)) {
       // delete
       Logs.info('delete folder ...');
       deleteFolderRecursive(templatePath);
     }
+
     // update
     Logs.info('create folder ...');
     fs.mkdirSync(templatePath, 0777);
@@ -83,23 +103,39 @@ program
   .command('generate [name]')
   .description('create meteor project [stable]')
   .action(function(name){
-    
-});
-
-program
-  .command('meteormobile [name]')
-  .description('create meteor mobile project')
-  .action(function(name){
-
+    ncp(path.resolve(getRootPath(), 'template', 'project'), path.resolve(getCurentPath(), name), function (err) {
+      if (err) {
+        return Logs.error(err);
+      }
+      Logs.info('done !');
+    });
 });
 
 program
   .command('collection [name] [where]')
-  .description('add meteor collection ')
+  .description('add meteor collection')
   .action(function(name, where){
   try {
-    console.log(name, where);
+    if(!_.isString(name))
+      throw new Error('name must be a string');
+    if(where != 'client' || where != server)
+      where = 'lib';
+
+    // check if path is meteor app
     isMeteorAppDir();
+    function getFile (where) {
+      return getRootPath() + '/template/collection/' + where + '.tmp';
+    }
+
+    // parse
+    var file = fs.readFileSync(getFile(where)).toString("utf-8");
+    file = parseTemplate({
+      collection: capitaliseFirstLetter(name),
+      name: name
+    }, file);
+
+    // write
+    fs.writeFileSync(path.resolve(getCurentPath(), where, 'collections', name + '.js') , file);
   }
   catch(err){
     Logs.error('collection: ' + err.message);
@@ -114,13 +150,3 @@ program
 });
 
 program.parse(process.argv);
-
-// var source = "<p>Hello, my name is {{name}}. I am from {{hometown}}. I have " +
-//          "{{kids.length}} kids:</p>" +
-//          "<ul>{{#kids}}<li>{{name}} is {{age}}</li>{{/kids}}</ul>";
-// var template = handlebars.compile(source);
-
-// var data = { "name": "Alan", "hometown": "Somewhere, TX",
-//          "kids": [{"name": "Jimmy", "age": "12"}, {"name": "Sally", "age": "4"}]};
-// var result = template(data);
-// console.log(result);
