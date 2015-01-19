@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var program     = require('commander');
 var fs          = require('fs');
-var clone       = require('nodegit').Repo.clone;
+var clone       = require('nodegit').Clone.clone;
 var handlebars  = require('handlebars');
 var path        = require('path');
 var Fiber       = require('fibers');
