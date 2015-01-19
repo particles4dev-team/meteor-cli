@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var program     = require('commander');
 var fs          = require('fs');
-var clone       = require("nodegit").Repo.clone;
+var clone       = require('nodegit').Repo.clone;
 var handlebars  = require('handlebars');
 var path        = require('path');
 var Fiber       = require('fibers');
@@ -143,10 +143,47 @@ program
 });
 
 program
+  .command('page [name]')
+  .description('create a new page in client -- incomplete')
+  .action(function(name){
+  try {
+    
+  }
+  catch(err){
+    Logs.error('page: ' + err.message);
+  }
+});
+
+program
+  .command('style [name]')
+  .description('create a new style file -- incomplete')
+  .action(function(name){
+  try {
+    
+  }
+  catch(err){
+    Logs.error('style: ' + err.message);
+  }
+});
+
+program
+  .command('create [path] [type]')
+  .description('create a new file or a folder (type=folder) with path -- incomplete')
+  .action(function(name){
+  try {
+    
+  }
+  catch(err){
+    Logs.error('create: ' + err.message);
+  }
+});
+
+
+program
   .command('*')
   .action(function(env){
-    console.log('Enter a Valid command');
-    terminate(true);
+    Logs.info('Enter a Valid command');
+    this.outputHelp();
 });
 
 program.parse(process.argv);
