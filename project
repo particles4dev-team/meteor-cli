@@ -180,6 +180,17 @@ program
   }
 });
 
+program
+  .command('packages [name]')
+  .description('create meteor packages [stable]')
+  .action(function(name){
+    ncp(path.resolve(getRootPath(), 'template', 'package'), path.resolve(getCurentPath(), name), function (err) {
+      if (err) {
+        return Logs.error(err);
+      }
+      Logs.info('done !');
+    });
+});
 
 program
   .command('*')
