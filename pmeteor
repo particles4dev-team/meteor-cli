@@ -2,6 +2,8 @@
 var program     = require('commander');
 var Logs        = require('./lib/utils/color');
 global.__rootPath = __dirname;
+global.__githubLink = "https://github.com/particles4dev-team/sample-project.git";
+global.__templateFolder = "meteor";
 
 // commands
 program
@@ -12,9 +14,9 @@ require( './lib/meteor/update' )( program );
 require( './lib/meteor/collection' )( program );
 
 program
-  	.command('*')
-  	.action(function(env){
-    	Logs.error('Enter a Valid command');
-    	this.outputHelp();
+    .command('*')
+    .action(function(env){
+        Logs.error('Enter a Valid command');
+        this.outputHelp();
 });
 program.parse( process.argv );

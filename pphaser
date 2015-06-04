@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+var program     = require('commander');
+var Logs        = require('./lib/utils/color');
+global.__rootPath = __dirname;
+global.__githubLink = "https://github.com/particles4dev-team/phaser-boilerplate.git";
+global.__templateFolder = "phaser";
+
+// commands
+program
+  .version('1.0.0')
+
+require( './lib/phaser/create' )( program );
+require( './lib/phaser/update' )( program );
+program
+  	.command('*')
+  	.action(function(env){
+    	Logs.error('Enter a Valid command');
+    	this.outputHelp();
+});
+program.parse( process.argv );
