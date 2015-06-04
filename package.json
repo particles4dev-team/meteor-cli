@@ -1,12 +1,11 @@
 {
   "name": "mcl",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "my command line tool for meteor",
   "main": "index.js",
   "dependencies": {
     "cli-color": "^0.3.2",
     "commander": "^2.3.0",
-    "fibers": "^1.0.1",
     "handlebars": "^2.0.0-alpha.4",
     "lodash": "^2.4.1",
     "ncp": "^0.6.0",

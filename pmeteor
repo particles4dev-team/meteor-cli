@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+var program     = require('commander');
+var Logs        = require('./lib/utils/color');
+global.__rootPath = __dirname;
+
+// commands
+program
+  .version('1.0.0')
+
+require( './lib/meteor/create' )( program );
+require( './lib/meteor/update' )( program );
+require( './lib/meteor/collection' )( program );
+
+program
+  	.command('*')
+  	.action(function(env){
+    	Logs.error('Enter a Valid command');
+    	this.outputHelp();
+});
+program.parse( process.argv );
