@@ -6,7 +6,7 @@
   "dependencies": {
     "cli-color": "^0.3.2",
     "commander": "^2.3.0",
-    "handlebars": "^2.0.0-alpha.4",
+    "handlebars": "^3.0.3",
     "lodash": "^2.4.1",
     "ncp": "^0.6.0",
     "nodegit": "^0.2.4"
