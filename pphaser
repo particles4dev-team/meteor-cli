@@ -7,10 +7,14 @@ global.__templateFolder = "phaser";
 
 // commands
 program
-  .version('1.0.0')
+  .version('1.1.0')
 
 require( './lib/phaser/create' )( program );
 require( './lib/phaser/update' )( program );
+require( './lib/phaser/state' )( program );
+require( './lib/phaser/plugin' )( program );
+require( './lib/phaser/entities' )( program );
+
 program
   	.command('*')
   	.action(function(env){
